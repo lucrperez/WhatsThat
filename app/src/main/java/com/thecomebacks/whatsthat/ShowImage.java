@@ -13,9 +13,7 @@ import android.util.Base64;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.thecomebacks.whatsthat.beans.Answer;
@@ -50,16 +48,11 @@ public class ShowImage extends AppCompatActivity {
         String username = currentIntet.getStringExtra(Constants.USER_USERNAME);
         int userId = currentIntet.getIntExtra(Constants.USER_ID, -1);
 
-        ImageButton btnLogout = (ImageButton) findViewById(R.id.show_image_btn_logout);
-        TextView tvUsername = (TextView) findViewById(R.id.show_image_username);
-        TextView tvCurrentPoints = (TextView) findViewById(R.id.show_image_txt_current_points);
+        Button btnLogout = (Button) findViewById(R.id.show_image_btn_logout);
+        Button btnPlay = (Button) findViewById(R.id.show_image_btn_play);
         ivImage = (ImageView) findViewById(R.id.img_image_view);
         etAnswer = (EditText) findViewById(R.id.et_image_text);
         Button btnSend = (Button) findViewById(R.id.btn_image_send);
-
-        tvUsername.setText(username);
-        // TODO load point from somewhere - Probably user object
-        tvCurrentPoints.setText(String.valueOf(1000));
 
         // TODO Load image
 
@@ -106,6 +99,9 @@ public class ShowImage extends AppCompatActivity {
                 }
             }
         });
+
+        btnPlay.setEnabled(false);
+        btnPlay.setClickable(false);
     }
 
     private class RetrieveImageRequest extends AsyncTask<User, Void, String> {

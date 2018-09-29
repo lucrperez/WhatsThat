@@ -16,6 +16,9 @@
     <string name="show_image_txt_points">Puntos: </string>
     <string name="show_image_ad_logout_title">Cerrar sesión</string>
     <string name="show_image_ad_logout_body">¿Esta seguro que quiere cerrar la sesión del usuario actual?</string>
+    <string name="show_image_btn_txt_play">PLAY!</string>
+    <string name="show_image_btn_points">Puntos</string>
+    <string name="show_image_btn_logout">Salir</string>
     <string name="accept">Aceptar</string>
     <string name="cancel">Cancelar</string>
 </resources>
