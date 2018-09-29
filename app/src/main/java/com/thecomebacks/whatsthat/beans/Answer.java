@@ -1,14 +1,31 @@
 package com.thecomebacks.whatsthat.beans;
 
-public class Answer {
+import org.json.JSONException;
+import org.json.JSONObject;
 
-    private String answer;
+public class Answer extends UserResponse {
 
-    public String getAnswer() {
-        return answer;
+    private int id;
+
+    public int getId() {
+        return id;
     }
 
-    public void setAnswer(String answer) {
-        this.answer = answer;
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    @Override
+    public JSONObject toJson() {
+        JSONObject json = new JSONObject();
+        try {
+            json.put("user", getUser());
+            json.put("hash", getHash());
+            json.put("response", getResponse());
+            json.put("id", getId());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return json;
     }
 }

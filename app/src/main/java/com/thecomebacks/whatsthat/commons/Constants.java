@@ -2,7 +2,7 @@ package com.thecomebacks.whatsthat.commons;
 
 public class Constants {
 
-    public static final String BASE_URL = "http://10.3.11.187:8090";
+    public static final String BASE_URL = "http://144.76.137.69:8090";
     public static final String LOGIN_URL = "/user";
     public static final String GET_IMAGE_URL = "/image";
     public static final String NEW_IMAGE_URL = "/newimage";

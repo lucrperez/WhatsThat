@@ -36,8 +36,11 @@ import com.thecomebacks.whatsthat.beans.UserResponse;
 import com.thecomebacks.whatsthat.commons.Constants;
 import com.thecomebacks.whatsthat.commons.Utils;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.math.BigInteger;
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -62,6 +65,9 @@ public class ShowImage extends AppCompatActivity {
 
     private static String username;
     private static String hash;
+
+    private int imageId;
+    private String userPoints;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -124,7 +130,13 @@ public class ShowImage extends AppCompatActivity {
             public void onClick(View v) {
                 String answer = etAnswer.getText().toString();
                 if (answer != null && !"".equals(answer)) {
-                    // TODO send the answer
+                    SendAnswer sendAnswer = new SendAnswer();
+                    Answer ans = new Answer();
+                    ans.setUser(username);
+                    ans.setHash(hash);
+                    ans.setResponse(answer);
+                    ans.setId(imageId);
+                    sendAnswer.execute(ans);
                 } else {
                     Toast toast = Toast.makeText(getApplicationContext(), R.string.show_image_no_answer, Toast.LENGTH_LONG);
                     toast.show();
@@ -155,18 +167,11 @@ public class ShowImage extends AppCompatActivity {
         btnPoints.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(ShowImage.this);
-                builder.setTitle(R.string.show_image_points_title);
-                String msg = getResources().getString(R.string.show_image_points_msg).replace(Constants.MSG_REPLACE_POINTS, String.valueOf(1000));
-                builder.setMessage(msg);
-                builder.setPositiveButton(R.string.accept, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-
-                    }
-                });
-                builder.create();
-                builder.show();
+                User currentUser = new User();
+                currentUser.setUser(username);
+                currentUser.setHash(hash);
+                RetrievePoints retrievePoints = new RetrievePoints();
+                retrievePoints.execute(currentUser);
             }
         });
 
@@ -251,18 +256,11 @@ public class ShowImage extends AppCompatActivity {
                         bitmap = android.provider.MediaStore.Images.Media
                                 .getBitmap(cr, selectedImage);
 
-                        //imageView.setImageBitmap(bitmap);
-                        /*Toast.makeText(this, selectedImage.toString(),
-                                Toast.LENGTH_LONG).show();*/
-                        // TODO convertir bitmap a Base64 y enviar al backend
+                        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos); //bm is the bitmap object
+                        byte[] b = baos.toByteArray();
 
-                        int bytes = bitmap.getByteCount();
-
-                        ByteBuffer buffer = ByteBuffer.allocate(bytes); //Create a new buffer
-                        bitmap.copyPixelsToBuffer(buffer); //Move the byte data to the buffer
-
-                        // DECODE
-                        String imgString = Base64.encodeToString(buffer.array(), Base64.NO_WRAP);
+                        String imgString = Base64.encodeToString(b, Base64.NO_WRAP);
 
                         UserResponse userResponse = new UserResponse();
                         userResponse.setUser(username);
@@ -329,6 +327,7 @@ public class ShowImage extends AppCompatActivity {
 
             if (response != null && !"".equals(response)) {
                 ImageBean imageBean = ImageBean.getUserFromResponse(response);
+                imageId = imageBean.getId();
                 byte[] decodeedString = Base64.decode(imageBean.getBase64(), Base64.DEFAULT);
                 Bitmap bitmap = BitmapFactory.decodeByteArray(decodeedString, 0, decodeedString.length);
                 ivImage.setImageBitmap(bitmap);
@@ -341,7 +340,19 @@ public class ShowImage extends AppCompatActivity {
 
         @Override
         protected String doInBackground(Answer... answers) {
-            return null;
+            return utils.generatePostOrPutRequest(Constants.METHOD_POST, Constants.SEND_ANSWER_URL, answers[0]);
+        }
+
+        @Override
+        protected void onPostExecute(String response) {
+            super.onPostExecute(response);
+
+            Intent intent = new Intent();
+            intent.setClass(getApplicationContext(), ShowImage.class);
+            intent.putExtra(Constants.USER_USERNAME, username);
+            intent.putExtra(Constants.USER_PASSWORD, hash);
+            startActivity(intent);
+            finish();
         }
     }
 
@@ -357,6 +368,33 @@ public class ShowImage extends AppCompatActivity {
         @Override
         protected void onPostExecute(String response) {
             super.onPostExecute(response);
+        }
+    }
+
+    private class RetrievePoints extends AsyncTask<User, Void, String> {
+        @Override
+        protected String doInBackground(User... user) {
+
+            return utils.generatePostOrPutRequest(Constants.METHOD_POST, Constants.SEND_POINTS_URL, user[0]);
+
+        }
+
+        @Override
+        protected void onPostExecute(String response) {
+            super.onPostExecute(response);
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(ShowImage.this);
+            builder.setTitle(R.string.show_image_points_title);
+            String msg = getResources().getString(R.string.show_image_points_msg).replace(Constants.MSG_REPLACE_POINTS, response);
+            builder.setMessage(msg);
+            builder.setPositiveButton(R.string.accept, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+
+                }
+            });
+            builder.create();
+            builder.show();
         }
     }
 }
