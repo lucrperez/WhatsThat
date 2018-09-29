@@ -12,6 +12,7 @@
     <string name="error_invalid_password">Contraseña demasiado corta</string>
     <string name="error_incorrect_password">Contraseña o nombre de usuario incorrectos</string>
     <string name="error_field_required">Todos los campos son requeridos</string>
+    <string name="show_image_loading_hint">La imagen se está cargando</string>
     <string name="show_image_answer_hint">¿Qué palabra te sugiere la imagen?</string>
     <string name="show_image_button_text">ENVIAR RESPUESTA!</string>
     <string name="show_image_no_answer">Es necesario escribir una respuesta</string>

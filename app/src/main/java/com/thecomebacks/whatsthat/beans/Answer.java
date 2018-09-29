@@ -5,14 +5,14 @@ import org.json.JSONObject;
 
 public class Answer extends UserResponse {
 
-    private int id;
+    private int image;
 
-    public int getId() {
-        return id;
+    public int getImage() {
+        return image;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setImage(int image) {
+        this.image = image;
     }
 
     @Override
@@ -22,7 +22,7 @@ public class Answer extends UserResponse {
             json.put("user", getUser());
             json.put("hash", getHash());
             json.put("response", getResponse());
-            json.put("id", getId());
+            json.put("image", getImage());
         } catch (JSONException e) {
             e.printStackTrace();
         }

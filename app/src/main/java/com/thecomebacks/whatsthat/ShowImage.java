@@ -38,9 +38,6 @@ import com.thecomebacks.whatsthat.commons.Utils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.math.BigInteger;
-import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -48,6 +45,7 @@ public class ShowImage extends AppCompatActivity {
 
     private ImageView ivImage;
     private EditText etAnswer;
+    private Button btnSend;
 
     private SharedPreferences sp;
     private SharedPreferences.Editor spEditor;
@@ -87,7 +85,7 @@ public class ShowImage extends AppCompatActivity {
         Button btnPlay = (Button) findViewById(R.id.show_image_btn_play);
         ivImage = (ImageView) findViewById(R.id.img_image_view);
         etAnswer = (EditText) findViewById(R.id.et_image_text);
-        Button btnSend = (Button) findViewById(R.id.btn_image_send);
+        btnSend = (Button) findViewById(R.id.btn_image_send);
         ImageButton btnInfo = (ImageButton) findViewById(R.id.show_image_btn_info);
         Button btnPoints = (Button) findViewById(R.id.show_image_btn_points);
         ImageButton btnCamera = (ImageButton) findViewById(R.id.show_image_btn_camera);
@@ -135,7 +133,7 @@ public class ShowImage extends AppCompatActivity {
                     ans.setUser(username);
                     ans.setHash(hash);
                     ans.setResponse(answer);
-                    ans.setId(imageId);
+                    ans.setImage(imageId);
                     sendAnswer.execute(ans);
                 } else {
                     Toast toast = Toast.makeText(getApplicationContext(), R.string.show_image_no_answer, Toast.LENGTH_LONG);
@@ -257,7 +255,7 @@ public class ShowImage extends AppCompatActivity {
                                 .getBitmap(cr, selectedImage);
 
                         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos); //bm is the bitmap object
+                        bitmap.compress(Bitmap.CompressFormat.JPEG, 75, baos); //bm is the bitmap object
                         byte[] b = baos.toByteArray();
 
                         String imgString = Base64.encodeToString(b, Base64.NO_WRAP);
@@ -368,6 +366,10 @@ public class ShowImage extends AppCompatActivity {
         @Override
         protected void onPostExecute(String response) {
             super.onPostExecute(response);
+
+            etAnswer.setEnabled(true);
+            etAnswer.setHint(R.string.show_image_answer_hint);
+            btnSend.setEnabled(true);
         }
     }
 

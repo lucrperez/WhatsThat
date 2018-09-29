@@ -63,10 +63,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/img_image_view"
-        android:hint="@string/show_image_answer_hint"
+        android:hint="@string/show_image_loading_hint"
         android:maxLines="1"
         android:singleLine="true"
-        android:inputType="textNoSuggestions"/>
+        android:inputType="textNoSuggestions"
+        android:enabled="false"/>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -80,7 +81,8 @@
             android:layout_below="@id/et_image_text"
             android:text="@string/show_image_button_text"
             android:layout_weight="0.8"
-            android:textSize="26sp"/>
+            android:textSize="26sp"
+            android:enabled="false"/>
 
         <ImageButton
             android:id="@+id/show_image_btn_camera"
