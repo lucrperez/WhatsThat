@@ -1,15 +1,21 @@
 package com.thecomebacks.whatsthat;
 
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Base64;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.thecomebacks.whatsthat.beans.Answer;
@@ -28,18 +34,63 @@ public class ShowImage extends AppCompatActivity {
 
     private ImageView ivImage;
     private EditText etAnswer;
-    private Button btnSend;
+
+    private SharedPreferences sp;
+    private SharedPreferences.Editor spEditor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_show_image);
 
+        sp = getSharedPreferences( getApplicationInfo().name, MODE_PRIVATE);
+
+        Intent currentIntet = this.getIntent();
+
+        String username = currentIntet.getStringExtra(Constants.USER_USERNAME);
+        int userId = currentIntet.getIntExtra(Constants.USER_ID, -1);
+
+        ImageButton btnLogout = (ImageButton) findViewById(R.id.show_image_btn_logout);
+        TextView tvUsername = (TextView) findViewById(R.id.show_image_username);
+        TextView tvCurrentPoints = (TextView) findViewById(R.id.show_image_txt_current_points);
         ivImage = (ImageView) findViewById(R.id.img_image_view);
         etAnswer = (EditText) findViewById(R.id.et_image_text);
-        btnSend = (Button) findViewById(R.id.btn_image_send);
+        Button btnSend = (Button) findViewById(R.id.btn_image_send);
+
+        tvUsername.setText(username);
+        // TODO load point from somewhere - Probably user object
+        tvCurrentPoints.setText(String.valueOf(1000));
 
         // TODO Load image
+
+        btnLogout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(ShowImage.this);
+                builder.setTitle(R.string.show_image_ad_logout_title);
+                builder.setMessage(R.string.show_image_ad_logout_body);
+                builder.setPositiveButton(R.string.accept, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        spEditor = sp.edit();
+                        spEditor.remove(Constants.USER_USERNAME);
+                        spEditor.remove(Constants.USER_ID);
+                        spEditor.remove(Constants.USER_PASSWORD);
+                        spEditor.apply();
+
+                        Intent intent = new Intent();
+                        intent.setClass(getApplicationContext(), LoginActivity.class);
+                        startActivity(intent);
+                        finish();
+                    }
+                });
+                builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                    }
+                });
+            }
+        });
 
         btnSend.setOnClickListener(new View.OnClickListener() {
             @Override
