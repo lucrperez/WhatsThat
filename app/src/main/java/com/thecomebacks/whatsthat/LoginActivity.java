@@ -50,6 +50,8 @@ public class LoginActivity extends AppCompatActivity {
     private SharedPreferences sp;
     private SharedPreferences.Editor spEditor;
 
+    private boolean sharedPreferences = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,31 +65,34 @@ public class LoginActivity extends AppCompatActivity {
 
         checkCurrentUser(userUsername, userPassword, userId);
 
-        // Set up the login form.
-        mUsernameView = (EditText) findViewById(R.id.username);
+        if (!sharedPreferences) {
 
-        mPasswordView = (EditText) findViewById(R.id.password);
-        mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
-                if (id == EditorInfo.IME_ACTION_DONE || id == EditorInfo.IME_NULL) {
-                    attemptLogin();
-                    return true;
+            // Set up the login form.
+            mUsernameView = (EditText) findViewById(R.id.username);
+
+            mPasswordView = (EditText) findViewById(R.id.password);
+            mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+                @Override
+                public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
+                    if (id == EditorInfo.IME_ACTION_DONE || id == EditorInfo.IME_NULL) {
+                        attemptLogin();
+                        return true;
+                    }
+                    return false;
                 }
-                return false;
-            }
-        });
+            });
 
-        Button mUsernameSignInButton = (Button) findViewById(R.id.username_sign_in_button);
-        mUsernameSignInButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                attemptLogin();
-            }
-        });
+            Button mUsernameSignInButton = (Button) findViewById(R.id.username_sign_in_button);
+            mUsernameSignInButton.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    attemptLogin();
+                }
+            });
 
-        mLoginFormView = findViewById(R.id.login_form);
-        mProgressView = findViewById(R.id.login_progress);
+            mLoginFormView = findViewById(R.id.login_form);
+            mProgressView = findViewById(R.id.login_progress);
+        }
     }
 
 
@@ -95,7 +100,7 @@ public class LoginActivity extends AppCompatActivity {
         if (username != null && !"".equals(username) &&
                 password != null && !"".equals(password) &&
                 userId != -1) {
-            showProgress(true);
+            sharedPreferences = true;
             mAuthTask = new UserLoginTask(username, password);
             mAuthTask.execute((Void) null);
         }
@@ -202,7 +207,7 @@ public class LoginActivity extends AppCompatActivity {
 
         UserLoginTask(String username, String password) {
             mUsername = username;
-            mPassword = Utils.md5(password);
+            mPassword = password;
         }
 
         @Override
@@ -222,7 +227,13 @@ public class LoginActivity extends AppCompatActivity {
                 String[] pieces = credential.split(":");
                 if (pieces[0].equals(mUsername)) {
                     // Account exists, return true if the password matches.
-                    if (pieces[1].equals(mPassword)) {
+                    if (!sharedPreferences && Utils.md5(pieces[1]).equals(Utils.md5(mPassword))) {
+                        // TODO POST Login request and retrieve user
+                        returnUser = new User();
+                        returnUser.setUsername(mUsername);
+                        returnUser.setPassword(Utils.md5(mPassword));
+                        returnUser.setId(1);
+                    } else if (sharedPreferences && Utils.md5(pieces[1]).equals(mPassword)) {
                         // TODO POST Login request and retrieve user
                         returnUser = new User();
                         returnUser.setUsername(mUsername);
@@ -238,7 +249,9 @@ public class LoginActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(final User user) {
             mAuthTask = null;
-            showProgress(false);
+            if (!sharedPreferences) {
+                showProgress(false);
+            }
 
             if (user != null) {
                 spEditor = sp.edit();
@@ -254,10 +267,19 @@ public class LoginActivity extends AppCompatActivity {
                 startActivity(intent);
                 finish();
             } else {
-                spEditor.remove(Constants.USER_USERNAME);
-                spEditor.remove(Constants.USER_PASSWORD);
-                spEditor.remove(Constants.USER_ID);
+
+                spEditor = sp.edit();
+                if (sp.contains(Constants.USER_USERNAME)) {
+                    spEditor.remove(Constants.USER_USERNAME);
+                }
+                if (sp.contains(Constants.USER_PASSWORD)) {
+                    spEditor.remove(Constants.USER_PASSWORD);
+                }
+                if (sp.contains(Constants.USER_ID)) {
+                    spEditor.remove(Constants.USER_ID);
+                }
                 spEditor.apply();
+                sharedPreferences = false;
 
                 mPasswordView.setError(getString(R.string.error_incorrect_password));
                 mPasswordView.requestFocus();
