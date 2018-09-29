@@ -50,10 +50,6 @@ public class LoginActivity extends AppCompatActivity {
     private SharedPreferences sp;
     private SharedPreferences.Editor spEditor;
 
-    private String userUsername;
-    private String userPassword;
-    private int userId;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -61,9 +57,9 @@ public class LoginActivity extends AppCompatActivity {
 
         // Create Shared Preferences
         sp = getSharedPreferences( getApplicationInfo().name, MODE_PRIVATE);
-        userUsername = sp.getString(Constants.USER_USERNAME,null);
-        userPassword = sp.getString(Constants.USER_PASSWORD, null);
-        userId = sp.getInt(Constants.USER_ID, -1);
+        String userUsername = sp.getString(Constants.USER_USERNAME,null);
+        String userPassword = sp.getString(Constants.USER_PASSWORD, null);
+        int userId = sp.getInt(Constants.USER_ID, -1);
 
         checkCurrentUser(userUsername, userPassword, userId);
 
