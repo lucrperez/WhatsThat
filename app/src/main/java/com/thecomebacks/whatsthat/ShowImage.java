@@ -329,6 +329,10 @@ public class ShowImage extends AppCompatActivity {
                 byte[] decodeedString = Base64.decode(imageBean.getBase64(), Base64.DEFAULT);
                 Bitmap bitmap = BitmapFactory.decodeByteArray(decodeedString, 0, decodeedString.length);
                 ivImage.setImageBitmap(bitmap);
+
+                etAnswer.setEnabled(true);
+                etAnswer.setHint(R.string.show_image_answer_hint);
+                btnSend.setEnabled(true);
             }
 
         }
@@ -366,10 +370,6 @@ public class ShowImage extends AppCompatActivity {
         @Override
         protected void onPostExecute(String response) {
             super.onPostExecute(response);
-
-            etAnswer.setEnabled(true);
-            etAnswer.setHint(R.string.show_image_answer_hint);
-            btnSend.setEnabled(true);
         }
     }
 
