@@ -297,7 +297,11 @@ public class LoginActivity extends AppCompatActivity {
 
             User returnUser = new User();
             returnUser.setUser(mUsername);
-            returnUser.setHash(Utils.md5(mPassword));
+            if (!sharedPreferences) {
+                returnUser.setHash(Utils.md5(mPassword));
+            } else {
+                returnUser.setHash(mPassword);
+            }
 
             String response = utils.generatePostOrPutRequest(Constants.METHOD_PUT, Constants.LOGIN_URL, returnUser);
             if (!Boolean.valueOf(response)) {

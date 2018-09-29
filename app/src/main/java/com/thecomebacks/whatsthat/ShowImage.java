@@ -70,10 +70,8 @@ public class ShowImage extends AppCompatActivity {
 
         sp = getSharedPreferences( getApplicationInfo().name, MODE_PRIVATE);
 
-        Intent currentIntet = this.getIntent();
-
-        username = currentIntet.getStringExtra(Constants.USER_USERNAME);
-        hash = currentIntet.getStringExtra(Constants.USER_PASSWORD);
+        username = sp.getString(Constants.USER_USERNAME, "");
+        hash = sp.getString(Constants.USER_PASSWORD, "");
 
         User currentUser = new User();
         currentUser.setUser(username);
@@ -359,14 +357,6 @@ public class ShowImage extends AppCompatActivity {
         @Override
         protected void onPostExecute(String response) {
             super.onPostExecute(response);
-
-            if (response != null && !"".equals(response)) {
-                ImageBean imageBean = ImageBean.getUserFromResponse(response);
-                byte[] decodeedString = Base64.decode(imageBean.getBase64(), Base64.DEFAULT);
-                Bitmap bitmap = BitmapFactory.decodeByteArray(decodeedString, 0, decodeedString.length);
-                ivImage.setImageBitmap(bitmap);
-            }
-
         }
     }
 }

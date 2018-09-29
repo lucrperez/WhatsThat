@@ -131,16 +131,6 @@ public class Utils {
             Class cls = objectToPost.getClass();
             Method method = cls.getDeclaredMethod("toJson");
             Object returnValue = method.invoke(objectToPost);
-            /*if (returnValue instanceof List<?>) {
-                List<?> returnList = (List<?>) returnValue;
-                JSONArray jsonArray = new JSONArray();
-                for (Object obj : returnList) {
-                    jsonArray.put(obj);
-                }
-                jsonPost.put(field.getName(), jsonArray);
-            } else {
-                jsonPost.put(field.getName(), returnValue);
-            }*/
             jsonPost = (JSONObject) returnValue;
         } catch (Exception e) {
             e.printStackTrace();
