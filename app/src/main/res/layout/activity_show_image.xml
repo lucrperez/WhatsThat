@@ -20,7 +20,7 @@
             android:enabled="false"
             android:background="@color/colorPrimary"
             android:text="@string/show_image_btn_txt_play"
-            android:textSize="26sp"
+            android:textSize="18sp"
             android:textStyle="bold"
             android:textColor="#EEE"/>
 
@@ -30,7 +30,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="0.3"
             android:text="@string/show_image_btn_points"
-            android:textSize="26sp"/>
+            android:textSize="18sp"/>
 
         <Button
             android:id="@+id/show_image_btn_logout"
@@ -38,7 +38,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="0.3"
             android:text="@string/show_image_btn_logout"
-            android:textSize="26sp"/>
+            android:textSize="18sp"/>
 
         <ImageButton
             android:id="@+id/show_image_btn_info"
