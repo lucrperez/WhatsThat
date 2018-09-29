@@ -189,9 +189,6 @@ public class ShowImage extends AppCompatActivity {
             if (permissionCheck == PackageManager.PERMISSION_DENIED) {
                 ActivityCompat.requestPermissions(ShowImage.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, MY_PERMISSIONS_REQUEST_STORE);
             } else {
-                /*Intent intent = new Intent();
-                intent.setClass(getApplicationContext(), CameraActivity.class);
-                startActivity(intent);*/
                 Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                 File photo = getOutputMediaFile(MEDIA_TYPE_IMAGE);
 
