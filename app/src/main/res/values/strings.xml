@@ -23,4 +23,6 @@
     <string name="cancel">Cancelar</string>
     <string name="how_to_play_title">Cómo jugar</string>
     <string name="how_to_play_msg">Este juego es muy sencillo. Escribe la palabra que te sugiera la imagen y envíanos tu respuesta. Si se corresponde con el algorítmo obtendrás puntos. También puedes enviarnos tus propias imágenes para que las añadamos al juego!</string>
+    <string name="show_image_points_title">Mi puntiación</string>
+    <string name="show_image_points_msg">Tienes %points% puntos</string>
 </resources>

@@ -11,4 +11,6 @@ public class Constants {
     public static final String USER_PASSWORD = "USER_PASSWORD";
     public static final String USER_ID = "USER_ID";
 
+    public static final String MSG_REPLACE_POINTS = "%points%";
+
 }

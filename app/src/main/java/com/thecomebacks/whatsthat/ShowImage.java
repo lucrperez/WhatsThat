@@ -55,6 +55,7 @@ public class ShowImage extends AppCompatActivity {
         etAnswer = (EditText) findViewById(R.id.et_image_text);
         Button btnSend = (Button) findViewById(R.id.btn_image_send);
         ImageButton btnInfo = (ImageButton) findViewById(R.id.show_image_btn_info);
+        Button btnPoints = (Button) findViewById(R.id.show_image_btn_points);
 
         // TODO Load image
 
@@ -111,6 +112,24 @@ public class ShowImage extends AppCompatActivity {
                 AlertDialog.Builder builder = new AlertDialog.Builder(ShowImage.this);
                 builder.setTitle(R.string.how_to_play_title);
                 builder.setMessage(R.string.how_to_play_msg);
+                builder.setPositiveButton(R.string.accept, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                });
+                builder.create();
+                builder.show();
+            }
+        });
+
+        btnPoints.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(ShowImage.this);
+                builder.setTitle(R.string.show_image_points_title);
+                String msg = getResources().getString(R.string.show_image_points_msg).replace(Constants.MSG_REPLACE_POINTS, String.valueOf(1000));
+                builder.setMessage(msg);
                 builder.setPositiveButton(R.string.accept, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
