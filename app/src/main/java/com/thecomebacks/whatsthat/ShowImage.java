@@ -17,7 +17,6 @@ import android.os.StrictMode;
 import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -33,15 +32,12 @@ import android.widget.Toast;
 import com.thecomebacks.whatsthat.beans.Answer;
 import com.thecomebacks.whatsthat.beans.ImageBean;
 import com.thecomebacks.whatsthat.beans.User;
+import com.thecomebacks.whatsthat.beans.UserResponse;
 import com.thecomebacks.whatsthat.commons.Constants;
+import com.thecomebacks.whatsthat.commons.Utils;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import java.nio.ByteBuffer;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -62,6 +58,11 @@ public class ShowImage extends AppCompatActivity {
     private static final int MEDIA_TYPE_IMAGE = 1;
     private static final int MEDIA_TYPE_VIDEO = 2;
 
+    private static Utils utils = new Utils();
+
+    private static String username;
+    private static String hash;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -71,8 +72,12 @@ public class ShowImage extends AppCompatActivity {
 
         Intent currentIntet = this.getIntent();
 
-        String username = currentIntet.getStringExtra(Constants.USER_USERNAME);
-        int userId = currentIntet.getIntExtra(Constants.USER_ID, -1);
+        username = currentIntet.getStringExtra(Constants.USER_USERNAME);
+        hash = currentIntet.getStringExtra(Constants.USER_PASSWORD);
+
+        User currentUser = new User();
+        currentUser.setUser(username);
+        currentUser.setHash(hash);
 
         Button btnLogout = (Button) findViewById(R.id.show_image_btn_logout);
         Button btnPlay = (Button) findViewById(R.id.show_image_btn_play);
@@ -83,7 +88,8 @@ public class ShowImage extends AppCompatActivity {
         Button btnPoints = (Button) findViewById(R.id.show_image_btn_points);
         ImageButton btnCamera = (ImageButton) findViewById(R.id.show_image_btn_camera);
 
-        // TODO Load image
+        RetrieveImageRequest retrieveImage = new RetrieveImageRequest();
+        retrieveImage.execute(currentUser);
 
         btnLogout.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -96,7 +102,6 @@ public class ShowImage extends AppCompatActivity {
                     public void onClick(DialogInterface dialog, int which) {
                         spEditor = sp.edit();
                         spEditor.remove(Constants.USER_USERNAME);
-                        spEditor.remove(Constants.USER_ID);
                         spEditor.remove(Constants.USER_PASSWORD);
                         spEditor.apply();
 
@@ -252,6 +257,23 @@ public class ShowImage extends AppCompatActivity {
                         /*Toast.makeText(this, selectedImage.toString(),
                                 Toast.LENGTH_LONG).show();*/
                         // TODO convertir bitmap a Base64 y enviar al backend
+
+                        int bytes = bitmap.getByteCount();
+
+                        ByteBuffer buffer = ByteBuffer.allocate(bytes); //Create a new buffer
+                        bitmap.copyPixelsToBuffer(buffer); //Move the byte data to the buffer
+
+                        // DECODE
+                        String imgString = Base64.encodeToString(buffer.array(), Base64.NO_WRAP);
+
+                        UserResponse userResponse = new UserResponse();
+                        userResponse.setUser(username);
+                        userResponse.setHash(hash);
+                        userResponse.setResponse(imgString);
+
+                        NewImageRequest newImageRequest = new NewImageRequest();
+                        newImageRequest.execute(userResponse);
+
                     } catch (Exception e) {
                         Toast.makeText(this, "Failed to load", Toast.LENGTH_SHORT)
                                 .show();
@@ -298,31 +320,9 @@ public class ShowImage extends AppCompatActivity {
 
         @Override
         protected String doInBackground(User... user) {
-            InputStream is = null;
-            String response = null;
 
-            try {
-                URL url = new URL(Constants.BASE_URL + Constants.GET_IMAGE_URL + String.valueOf(user[0].getId()));
-                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                conn.setReadTimeout(10000);
-                conn.setConnectTimeout(15000);
+            return utils.generatePostOrPutRequest(Constants.METHOD_POST, Constants.GET_IMAGE_URL, user[0]);
 
-                conn.setRequestMethod("GET");
-                conn.setDoInput(true);
-
-                conn.connect();
-                is = conn.getInputStream();
-
-                response = readIt(is);
-                //byte[] decodeedString = Base64.decode(base64Response, Base64.DEFAULT);
-                //response = BitmapFactory.decodeByteArray(decodeedString, 0, decodeedString.length);
-
-                is.close();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-            return response;
         }
 
         @Override
@@ -331,21 +331,11 @@ public class ShowImage extends AppCompatActivity {
 
             if (response != null && !"".equals(response)) {
                 ImageBean imageBean = ImageBean.getUserFromResponse(response);
-                byte[] decodeedString = Base64.decode(imageBean.getEncodedImage(), Base64.DEFAULT);
+                byte[] decodeedString = Base64.decode(imageBean.getBase64(), Base64.DEFAULT);
                 Bitmap bitmap = BitmapFactory.decodeByteArray(decodeedString, 0, decodeedString.length);
                 ivImage.setImageBitmap(bitmap);
             }
 
-        }
-
-        public String readIt(InputStream stream) throws IOException {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(stream, "utf-8"), 8);
-            StringBuilder sb = new StringBuilder();
-            String line = null;
-            while ((line = reader.readLine()) != null) {
-                sb.append(line + "\n");
-            }
-            return sb.toString();
         }
     }
 
@@ -354,6 +344,29 @@ public class ShowImage extends AppCompatActivity {
         @Override
         protected String doInBackground(Answer... answers) {
             return null;
+        }
+    }
+
+    private class NewImageRequest extends AsyncTask<UserResponse, Void, String> {
+
+        @Override
+        protected String doInBackground(UserResponse... user) {
+
+            return utils.generatePostOrPutRequest(Constants.METHOD_POST, Constants.NEW_IMAGE_URL, user[0]);
+
+        }
+
+        @Override
+        protected void onPostExecute(String response) {
+            super.onPostExecute(response);
+
+            if (response != null && !"".equals(response)) {
+                ImageBean imageBean = ImageBean.getUserFromResponse(response);
+                byte[] decodeedString = Base64.decode(imageBean.getBase64(), Base64.DEFAULT);
+                Bitmap bitmap = BitmapFactory.decodeByteArray(decodeedString, 0, decodeedString.length);
+                ivImage.setImageBitmap(bitmap);
+            }
+
         }
     }
 }

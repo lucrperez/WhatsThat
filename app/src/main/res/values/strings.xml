@@ -3,12 +3,14 @@
     <string name="title_activity_login2">Sign in</string>
     <!-- Strings related to login -->
     <string name="prompt_username">Username</string>
-    <string name="prompt_password">Password</string>
-    <string name="action_sign_in">Sign in</string>
-    <string name="action_sign_in_short">Sign in</string>
+    <string name="prompt_password">Contraseña</string>
+    <string name="prompt_confirm_password">Confirmar Contraseña</string>
+    <string name="action_sign_in">Entrar</string>
+    <string name="action_sign_in_short">Entrar</string>
+    <string name="action_register">Registrate</string>
     <string name="error_invalid_username">El nombre de usuario no es válido</string>
-    <string name="error_invalid_password">Password demasiado corto</string>
-    <string name="error_incorrect_password">Password o nombre de usuario incorrectos</string>
+    <string name="error_invalid_password">Contraseña demasiado corta</string>
+    <string name="error_incorrect_password">Contraseña o nombre de usuario incorrectos</string>
     <string name="error_field_required">Todos los campos son requeridos</string>
     <string name="show_image_answer_hint">¿Qué palabra te sugiere la imagen?</string>
     <string name="show_image_button_text">ENVIAR RESPUESTA!</string>
@@ -21,6 +23,7 @@
     <string name="show_image_btn_logout">Salir</string>
     <string name="accept">Aceptar</string>
     <string name="cancel">Cancelar</string>
+    <string name="create">Crear Usuario</string>
     <string name="how_to_play_title">Cómo jugar</string>
     <string name="how_to_play_msg">Este juego es muy sencillo. Escribe la palabra que te sugiera la imagen y envíanos tu respuesta. Si se corresponde con el algorítmo obtendrás puntos. También puedes enviarnos tus propias imágenes para que las añadamos al juego!</string>
     <string name="show_image_points_title">Mi puntiación</string>

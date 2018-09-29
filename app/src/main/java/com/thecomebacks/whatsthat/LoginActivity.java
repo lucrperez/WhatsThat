@@ -24,6 +24,9 @@ import com.thecomebacks.whatsthat.beans.User;
 import com.thecomebacks.whatsthat.commons.Constants;
 import com.thecomebacks.whatsthat.commons.Utils;
 
+import java.net.HttpURLConnection;
+import java.net.URL;
+
 /**
  * A login screen that offers login via username/password.
  */
@@ -40,6 +43,7 @@ public class LoginActivity extends AppCompatActivity {
      * Keep track of the login task to ensure we can cancel it if requested.
      */
     private UserLoginTask mAuthTask = null;
+    private UserRegisterTask mRegisterTask = null;
 
     // UI references.
     private EditText mUsernameView;
@@ -52,6 +56,10 @@ public class LoginActivity extends AppCompatActivity {
 
     private boolean sharedPreferences = false;
 
+    private boolean registerView = false;
+
+    private Utils utils = new Utils();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -61,16 +69,16 @@ public class LoginActivity extends AppCompatActivity {
         sp = getSharedPreferences( getApplicationInfo().name, MODE_PRIVATE);
         String userUsername = sp.getString(Constants.USER_USERNAME,null);
         String userPassword = sp.getString(Constants.USER_PASSWORD, null);
-        int userId = sp.getInt(Constants.USER_ID, -1);
 
-        checkCurrentUser(userUsername, userPassword, userId);
-
-        if (!sharedPreferences) {
+        if (userUsername != null && !"".equals(userUsername) &&
+                userPassword != null && !"".equals(userPassword)) {
+            checkCurrentUser(userUsername, userPassword);
+        } else {
 
             // Set up the login form.
-            mUsernameView = (EditText) findViewById(R.id.username);
+            mUsernameView = (EditText) findViewById(R.id.user);
 
-            mPasswordView = (EditText) findViewById(R.id.password);
+            mPasswordView = (EditText) findViewById(R.id.hash);
             mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
                 @Override
                 public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
@@ -82,7 +90,7 @@ public class LoginActivity extends AppCompatActivity {
                 }
             });
 
-            Button mUsernameSignInButton = (Button) findViewById(R.id.username_sign_in_button);
+            final Button mUsernameSignInButton = (Button) findViewById(R.id.username_sign_in_button);
             mUsernameSignInButton.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -92,14 +100,40 @@ public class LoginActivity extends AppCompatActivity {
 
             mLoginFormView = findViewById(R.id.login_form);
             mProgressView = findViewById(R.id.login_progress);
+
+            final Button btnRegister = (Button) findViewById(R.id.username_register_button);
+            btnRegister.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (registerView) {
+                        mUsernameSignInButton.setText(R.string.action_sign_in);
+                        btnRegister.setText(R.string.action_register);
+                        mUsernameSignInButton.setOnClickListener(new OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                attemptLogin();
+                            }
+                        });
+                    } else {
+                        mUsernameSignInButton.setText(R.string.create);
+                        btnRegister.setText(R.string.cancel);
+                        mUsernameSignInButton.setOnClickListener(new OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                attemptRegister();
+                            }
+                        });
+                    }
+                    registerView = !registerView;
+                }
+            });
         }
     }
 
 
-    private void checkCurrentUser (String username, String password, int userId) {
+    private void checkCurrentUser (String username, String password) {
         if (username != null && !"".equals(username) &&
-                password != null && !"".equals(password) &&
-                userId != -1) {
+                password != null && !"".equals(password)) {
             sharedPreferences = true;
             mAuthTask = new UserLoginTask(username, password);
             mAuthTask.execute((Void) null);
@@ -155,8 +189,56 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
+
+    /**
+     * Attempts to sign in or register the account specified by the login form.
+     * If there are form errors (invalid username, missing fields, etc.), the
+     * errors are presented and no actual login attempt is made.
+     */
+    private void attemptRegister() {
+        if (mRegisterTask != null) {
+            return;
+        }
+
+        // Reset errors.
+        mUsernameView.setError(null);
+        mPasswordView.setError(null);
+
+        // Store values at the time of the login attempt.
+        String username = mUsernameView.getText().toString();
+        String password = mPasswordView.getText().toString();
+
+        boolean cancel = false;
+        View focusView = null;
+
+        // Check for a valid password, if the user entered one.
+        if (!TextUtils.isEmpty(password) && !isPasswordValid(password)) {
+            mPasswordView.setError(getString(R.string.error_invalid_password));
+            focusView = mPasswordView;
+            cancel = true;
+        }
+
+        // Check for a valid username.
+        if (TextUtils.isEmpty(username)) {
+            mUsernameView.setError(getString(R.string.error_field_required));
+            focusView = mUsernameView;
+            cancel = true;
+        }
+
+        if (cancel) {
+            // There was an error; don't attempt login and focus the first
+            // form field with an error.
+            focusView.requestFocus();
+        } else {
+            // Show a progress spinner, and kick off a background task to
+            // perform the user login attempt.
+            showProgress(true);
+            mRegisterTask = new UserRegisterTask(username, password);
+            mRegisterTask.execute((Void) null);
+        }
+    }
+
     private boolean isPasswordValid(String password) {
-        //TODO: Replace this with your own logic
         return password.length() > 4;
     }
 
@@ -212,35 +294,14 @@ public class LoginActivity extends AppCompatActivity {
 
         @Override
         protected User doInBackground(Void... params) {
-            // TODO: attempt authentication against a network service.
 
-            User returnUser = null;
+            User returnUser = new User();
+            returnUser.setUser(mUsername);
+            returnUser.setHash(Utils.md5(mPassword));
 
-            try {
-                // Simulate network access.
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-                return returnUser;
-            }
-
-            for (String credential : DUMMY_CREDENTIALS) {
-                String[] pieces = credential.split(":");
-                if (pieces[0].equals(mUsername)) {
-                    // Account exists, return true if the password matches.
-                    if (!sharedPreferences && Utils.md5(pieces[1]).equals(Utils.md5(mPassword))) {
-                        // TODO POST Login request and retrieve user
-                        returnUser = new User();
-                        returnUser.setUsername(mUsername);
-                        returnUser.setPassword(Utils.md5(mPassword));
-                        returnUser.setId(1);
-                    } else if (sharedPreferences && Utils.md5(pieces[1]).equals(mPassword)) {
-                        // TODO POST Login request and retrieve user
-                        returnUser = new User();
-                        returnUser.setUsername(mUsername);
-                        returnUser.setPassword(mPassword);
-                        returnUser.setId(1);
-                    }
-                }
+            String response = utils.generatePostOrPutRequest(Constants.METHOD_PUT, Constants.LOGIN_URL, returnUser);
+            if (!Boolean.valueOf(response)) {
+                returnUser = null;
             }
 
             return returnUser;
@@ -255,15 +316,14 @@ public class LoginActivity extends AppCompatActivity {
 
             if (user != null) {
                 spEditor = sp.edit();
-                spEditor.putString(Constants.USER_USERNAME, user.getUsername());
-                spEditor.putString(Constants.USER_PASSWORD, user.getPassword());
-                spEditor.putInt(Constants.USER_ID, user.getId());
+                spEditor.putString(Constants.USER_USERNAME, user.getUser());
+                spEditor.putString(Constants.USER_PASSWORD, user.getHash());
                 spEditor.apply();
 
                 Intent intent = new Intent();
                 intent.setClass(getApplicationContext(), ShowImage.class);
-                intent.putExtra(Constants.USER_ID, user.getId());
-                intent.putExtra(Constants.USER_USERNAME, user.getUsername());
+                intent.putExtra(Constants.USER_USERNAME, user.getUser());
+                intent.putExtra(Constants.USER_PASSWORD, user.getHash());
                 startActivity(intent);
                 finish();
             } else {
@@ -275,8 +335,77 @@ public class LoginActivity extends AppCompatActivity {
                 if (sp.contains(Constants.USER_PASSWORD)) {
                     spEditor.remove(Constants.USER_PASSWORD);
                 }
-                if (sp.contains(Constants.USER_ID)) {
-                    spEditor.remove(Constants.USER_ID);
+                spEditor.apply();
+                sharedPreferences = false;
+
+                mPasswordView.setError(getString(R.string.error_incorrect_password));
+                mPasswordView.requestFocus();
+            }
+        }
+
+        @Override
+        protected void onCancelled() {
+            mAuthTask = null;
+            showProgress(false);
+        }
+    }
+
+    /**
+     * Represents an asynchronous login/registration task used to authenticate
+     * the user.
+     */
+    public class UserRegisterTask extends AsyncTask<Void, Void, User> {
+
+        private final String mUsername;
+        private final String mPassword;
+
+        UserRegisterTask(String username, String password) {
+            mUsername = username;
+            mPassword = password;
+        }
+
+        @Override
+        protected User doInBackground(Void... params) {
+
+            User returnUser = new User();
+            returnUser.setUser(mUsername);
+            returnUser.setHash(Utils.md5(mPassword));
+
+            String response = utils.generatePostOrPutRequest(Constants.METHOD_POST, Constants.LOGIN_URL, returnUser);
+            if (!Boolean.valueOf(response)) {
+                returnUser = null;
+            }
+
+            return returnUser;
+        }
+
+        @Override
+        protected void onPostExecute(final User user) {
+            mAuthTask = null;
+            if (!sharedPreferences) {
+                showProgress(false);
+            }
+
+            if (user != null) {
+                spEditor = sp.edit();
+                spEditor.putString(Constants.USER_USERNAME, user.getUser());
+                spEditor.putString(Constants.USER_PASSWORD, user.getHash());
+                spEditor.apply();
+
+                Intent intent = new Intent();
+                intent.setClass(getApplicationContext(), ShowImage.class);
+                intent.putExtra(Constants.USER_USERNAME, user.getUser());
+                intent.putExtra(Constants.USER_PASSWORD, user.getHash());
+                startActivity(intent);
+                finish();
+            } else {
+
+                spEditor = sp.edit();
+                if (sp.contains(Constants.USER_USERNAME)) {
+                    spEditor.remove(Constants.USER_USERNAME);
+                }
+                if (sp.contains(Constants.USER_PASSWORD)) {
+                    spEditor.remove(Constants.USER_PASSWORD);
                 }
                 spEditor.apply();
                 sharedPreferences = false;
