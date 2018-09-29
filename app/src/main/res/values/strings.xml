@@ -1,0 +1,31 @@
+<resources>
+    <string name="app_name">What\'s That</string>
+    <string name="title_activity_login2">Sign in</string>
+    <!-- Strings related to login -->
+    <string name="prompt_username">Username</string>
+    <string name="prompt_password">Password</string>
+    <string name="action_sign_in">Log in</string>
+    <string name="action_sign_in_short">Log in</string>
+    <string name="action_register">Sign in</string>
+    <string name="error_invalid_username">User name is invalid</string>
+    <string name="error_invalid_password">Password is too short</string>
+    <string name="error_incorrect_password">Wrong password or username</string>
+    <string name="error_field_required">All fields are required</string>
+    <string name="show_image_loading_hint">Image is loading</string>
+    <string name="show_image_answer_hint">What word does the image represent?</string>
+    <string name="show_image_button_text">SEND ANSWER!</string>
+    <string name="show_image_no_answer">An answer is needed</string>
+    <string name="show_image_txt_points">Points: </string>
+    <string name="show_image_ad_logout_title">Close session</string>
+    <string name="show_image_ad_logout_body">Are you sure you want to close the current session?</string>
+    <string name="show_image_btn_txt_play">PLAY!</string>
+    <string name="show_image_btn_points">Points</string>
+    <string name="show_image_btn_logout">Quit</string>
+    <string name="accept">Accept</string>
+    <string name="cancel">Cancel</string>
+    <string name="create">Create User</string>
+    <string name="how_to_play_title">How to Play</string>
+    <string name="how_to_play_msg">This is a very simple game. Write the word that you think that represents the photo shown and send that answer. If the word is contained in our recognition service words list you will earn some points. You can also upload your own images!</string>
+    <string name="show_image_points_title">My points</string>
+    <string name="show_image_points_msg">You have %points% points</string>
+</resources>

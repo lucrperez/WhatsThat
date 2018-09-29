@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".ShowImage">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/show_image_btn_play"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="0.3"
+            android:enabled="false"
+            android:background="@color/colorPrimary"
+            android:text="@string/show_image_btn_txt_play"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="#EEE"/>
+
+        <Button
+            android:id="@+id/show_image_btn_points"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.3"
+            android:text="@string/show_image_btn_points"
+            android:textSize="18sp"/>
+
+        <Button
+            android:id="@+id/show_image_btn_logout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.3"
+            android:text="@string/show_image_btn_logout"
+            android:textSize="18sp"/>
+
+        <ImageButton
+            android:id="@+id/show_image_btn_info"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:scaleType="center"
+            android:src="@mipmap/baseline_info_black_18dp"/>
+
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/img_image_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:scaleType="fitCenter"
+        android:src="@mipmap/ic_launcher"
+        android:layout_weight="0.7"
+        />
+
+    <EditText
+        android:id="@+id/et_image_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/img_image_view"
+        android:hint="@string/show_image_loading_hint"
+        android:maxLines="1"
+        android:singleLine="true"
+        android:inputType="textNoSuggestions"
+        android:enabled="false"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/btn_image_send"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/et_image_text"
+            android:text="@string/show_image_button_text"
+            android:layout_weight="0.8"
+            android:textSize="26sp"
+            android:enabled="false"/>
+
+        <ImageButton
+            android:id="@+id/show_image_btn_camera"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="0.2"
+            android:src="@mipmap/baseline_camera_alt_black_18dp"/>
+    </LinearLayout>
+
+</LinearLayout>
