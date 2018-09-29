@@ -4,6 +4,7 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 
 import android.os.AsyncTask;
@@ -15,10 +16,13 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
-import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+
+import com.thecomebacks.whatsthat.beans.User;
+import com.thecomebacks.whatsthat.commons.Constants;
+import com.thecomebacks.whatsthat.commons.Utils;
 
 /**
  * A login screen that offers login via username/password.
@@ -26,16 +30,11 @@ import android.widget.TextView;
 public class LoginActivity extends AppCompatActivity {
 
     /**
-     * Id to identity READ_CONTACTS permission request.
-     */
-    private static final int REQUEST_READ_CONTACTS = 0;
-
-    /**
      * A dummy authentication store containing known user names and passwords.
      * TODO: remove after connecting to a real authentication system.
      */
     private static final String[] DUMMY_CREDENTIALS = new String[]{
-            "foo@example.com:hello", "bar@example.com:world"
+            "hello:hello", "world:world"
     };
     /**
      * Keep track of the login task to ensure we can cancel it if requested.
@@ -43,17 +42,33 @@ public class LoginActivity extends AppCompatActivity {
     private UserLoginTask mAuthTask = null;
 
     // UI references.
-    private AutoCompleteTextView mUsernameView;
+    private EditText mUsernameView;
     private EditText mPasswordView;
     private View mProgressView;
     private View mLoginFormView;
+
+    private SharedPreferences sp;
+    private SharedPreferences.Editor spEditor;
+
+    private String userUsername;
+    private String userPassword;
+    private int userId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
+        // Create Shared Preferences
+        sp = getSharedPreferences( getApplicationInfo().name, MODE_PRIVATE);
+        userUsername = sp.getString(Constants.USER_USERNAME,null);
+        userPassword = sp.getString(Constants.USER_PASSWORD, null);
+        userId = sp.getInt(Constants.USER_ID, -1);
+
+        checkCurrentUser(userUsername, userPassword, userId);
+
         // Set up the login form.
-        mUsernameView = (AutoCompleteTextView) findViewById(R.id.username);
+        mUsernameView = (EditText) findViewById(R.id.username);
 
         mPasswordView = (EditText) findViewById(R.id.password);
         mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -77,6 +92,17 @@ public class LoginActivity extends AppCompatActivity {
 
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
+    }
+
+
+    private void checkCurrentUser (String username, String password, int userId) {
+        if (username != null && !"".equals(username) &&
+                password != null && !"".equals(password) &&
+                userId != -1) {
+            showProgress(true);
+            mAuthTask = new UserLoginTask(username, password);
+            mAuthTask.execute((Void) null);
+        }
     }
 
 
@@ -173,49 +199,67 @@ public class LoginActivity extends AppCompatActivity {
      * Represents an asynchronous login/registration task used to authenticate
      * the user.
      */
-    public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
+    public class UserLoginTask extends AsyncTask<Void, Void, User> {
 
         private final String mUsername;
         private final String mPassword;
 
         UserLoginTask(String username, String password) {
             mUsername = username;
-            mPassword = password;
+            mPassword = Utils.md5(password);
         }
 
         @Override
-        protected Boolean doInBackground(Void... params) {
+        protected User doInBackground(Void... params) {
             // TODO: attempt authentication against a network service.
+
+            User returnUser = null;
 
             try {
                 // Simulate network access.
                 Thread.sleep(2000);
             } catch (InterruptedException e) {
-                return false;
+                return returnUser;
             }
 
             for (String credential : DUMMY_CREDENTIALS) {
                 String[] pieces = credential.split(":");
                 if (pieces[0].equals(mUsername)) {
                     // Account exists, return true if the password matches.
-                    return pieces[1].equals(mPassword);
+                    if (pieces[1].equals(mPassword)) {
+                        // TODO POST Login request and retrieve user
+                        returnUser = new User();
+                        returnUser.setUsername(mUsername);
+                        returnUser.setPassword(mPassword);
+                        returnUser.setId(1);
+                    }
                 }
             }
 
-            // TODO: register the new account here.
-            return true;
+            return returnUser;
         }
 
         @Override
-        protected void onPostExecute(final Boolean success) {
+        protected void onPostExecute(final User user) {
             mAuthTask = null;
             showProgress(false);
 
-            if (success) {
+            if (user != null) {
+                spEditor = sp.edit();
+                spEditor.putString(Constants.USER_USERNAME, user.getUsername());
+                spEditor.putString(Constants.USER_PASSWORD, user.getPassword());
+                spEditor.putInt(Constants.USER_ID, user.getId());
+                spEditor.apply();
+
                 Intent intent = new Intent();
                 intent.setClass(getApplicationContext(), ShowImage.class);
+                intent.putExtra(Constants.USER_ID, user.getId());
                 finish();
             } else {
+                spEditor.remove(Constants.USER_USERNAME);
+                spEditor.remove(Constants.USER_PASSWORD);
+                spEditor.remove(Constants.USER_ID);
+
                 mPasswordView.setError(getString(R.string.error_incorrect_password));
                 mPasswordView.requestFocus();
             }
