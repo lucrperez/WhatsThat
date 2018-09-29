@@ -10,7 +10,7 @@
     <string name="error_invalid_password">Password demasiado corto</string>
     <string name="error_incorrect_password">Password o nombre de usuario incorrectos</string>
     <string name="error_field_required">Todos los campos son requeridos</string>
-    <string name="show_image_answer_hint">Escribe tu respuesta</string>
+    <string name="show_image_answer_hint">¿Qué palabra te sugiere la imagen?</string>
     <string name="show_image_button_text">ENVIAR RESPUESTA!</string>
     <string name="show_image_no_answer">Es necesario escribir una respuesta</string>
     <string name="show_image_txt_points">Puntos: </string>
@@ -21,4 +21,6 @@
     <string name="show_image_btn_logout">Salir</string>
     <string name="accept">Aceptar</string>
     <string name="cancel">Cancelar</string>
+    <string name="how_to_play_title">Cómo jugar</string>
+    <string name="how_to_play_msg">Este juego es muy sencillo. Escribe la palabra que te sugiera la imagen y envíanos tu respuesta. Si se corresponde con el algorítmo obtendrás puntos. También puedes enviarnos tus propias imágenes para que las añadamos al juego!</string>
 </resources>

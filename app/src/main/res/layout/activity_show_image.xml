@@ -10,14 +10,13 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="0.1"
         android:orientation="horizontal">
 
         <Button
             android:id="@+id/show_image_btn_play"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="0.34"
+            android:layout_weight="0.3"
             android:enabled="false"
             android:background="@color/colorPrimary"
             android:text="@string/show_image_btn_txt_play"
@@ -29,7 +28,7 @@
             android:id="@+id/show_image_btn_points"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="0.33"
+            android:layout_weight="0.3"
             android:text="@string/show_image_btn_points"
             android:textSize="26sp"/>
 
@@ -37,9 +36,15 @@
             android:id="@+id/show_image_btn_logout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="0.33"
+            android:layout_weight="0.3"
             android:text="@string/show_image_btn_logout"
             android:textSize="26sp"/>
+
+        <ImageButton
+            android:id="@+id/show_image_btn_info"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@mipmap/baseline_info_black_18dp"/>
 
     </LinearLayout>
 
@@ -58,15 +63,30 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/img_image_view"
         android:hint="@string/show_image_answer_hint"
-        android:layout_weight="0.1"/>
+        android:maxLines="1"
+        android:singleLine="true"
+        android:inputType="textNoSuggestions"/>
 
-    <Button
-        android:id="@+id/btn_image_send"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/et_image_text"
-        android:text="@string/show_image_button_text"
-        android:layout_weight="0.1"
-        android:textSize="26sp"/>
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/btn_image_send"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/et_image_text"
+            android:text="@string/show_image_button_text"
+            android:layout_weight="0.8"
+            android:textSize="26sp"/>
+
+        <ImageButton
+            android:id="@+id/show_image_btn_camera"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="0.2"
+            android:src="@mipmap/baseline_camera_alt_black_18dp"/>
+    </LinearLayout>
 
 </LinearLayout>

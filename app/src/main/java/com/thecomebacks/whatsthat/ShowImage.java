@@ -13,6 +13,7 @@ import android.util.Base64;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -53,6 +54,7 @@ public class ShowImage extends AppCompatActivity {
         ivImage = (ImageView) findViewById(R.id.img_image_view);
         etAnswer = (EditText) findViewById(R.id.et_image_text);
         Button btnSend = (Button) findViewById(R.id.btn_image_send);
+        ImageButton btnInfo = (ImageButton) findViewById(R.id.show_image_btn_info);
 
         // TODO Load image
 
@@ -102,6 +104,23 @@ public class ShowImage extends AppCompatActivity {
 
         btnPlay.setEnabled(false);
         btnPlay.setClickable(false);
+
+        btnInfo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(ShowImage.this);
+                builder.setTitle(R.string.how_to_play_title);
+                builder.setMessage(R.string.how_to_play_msg);
+                builder.setPositiveButton(R.string.accept, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                });
+                builder.create();
+                builder.show();
+            }
+        });
     }
 
     private class RetrieveImageRequest extends AsyncTask<User, Void, String> {
