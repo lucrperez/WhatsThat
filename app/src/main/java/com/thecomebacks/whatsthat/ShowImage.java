@@ -1,11 +1,16 @@
 package com.thecomebacks.whatsthat;
 
+import android.Manifest;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -37,6 +42,11 @@ public class ShowImage extends AppCompatActivity {
     private SharedPreferences sp;
     private SharedPreferences.Editor spEditor;
 
+    private static final int MY_PERMISSIONS_REQUEST_READ_CAMERA = 100;
+    private static final int MY_PERMISSIONS_REQUEST_STORE = 200;
+
+    private boolean grantedPermissions = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,6 +66,7 @@ public class ShowImage extends AppCompatActivity {
         Button btnSend = (Button) findViewById(R.id.btn_image_send);
         ImageButton btnInfo = (ImageButton) findViewById(R.id.show_image_btn_info);
         Button btnPoints = (Button) findViewById(R.id.show_image_btn_points);
+        ImageButton btnCamera = (ImageButton) findViewById(R.id.show_image_btn_camera);
 
         // TODO Load image
 
@@ -140,6 +151,72 @@ public class ShowImage extends AppCompatActivity {
                 builder.show();
             }
         });
+
+        btnCamera.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (checkCameraHardware(getApplicationContext()) && checkCameraPermission() && checkStorePermission()) {
+                    Intent intent = new Intent();
+                    intent.setClass(getApplicationContext(), CameraActivity.class);
+                    startActivity(intent);
+                }
+            }
+        });
+    }
+
+    private boolean checkCameraPermission() {
+        grantedPermissions = false;
+        int permissionCheck = ContextCompat.checkSelfPermission(ShowImage.this, Manifest.permission.CAMERA);
+        if (permissionCheck == PackageManager.PERMISSION_DENIED) {
+            ActivityCompat.requestPermissions(ShowImage.this, new String[]{Manifest.permission.CAMERA}, MY_PERMISSIONS_REQUEST_READ_CAMERA);
+            return grantedPermissions;
+        } else {
+            return true;
+        }
+    }
+
+    private boolean checkStorePermission() {
+        grantedPermissions = false;
+        int permissionCheck = ContextCompat.checkSelfPermission(ShowImage.this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        if (permissionCheck == PackageManager.PERMISSION_DENIED) {
+            ActivityCompat.requestPermissions(ShowImage.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, MY_PERMISSIONS_REQUEST_READ_CAMERA);
+            return grantedPermissions;
+        } else {
+            return true;
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case MY_PERMISSIONS_REQUEST_READ_CAMERA: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    grantedPermissions = true;
+                }
+                return;
+            }
+            case MY_PERMISSIONS_REQUEST_STORE: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    grantedPermissions = true;
+                }
+                return;
+            }
+        }
+    }
+
+    /** Check if this device has a camera */
+    private boolean checkCameraHardware(Context context) {
+        if (context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA)){
+            // this device has a camera
+            return true;
+        } else {
+            // no camera on this device
+            return false;
+        }
     }
 
     private class RetrieveImageRequest extends AsyncTask<User, Void, String> {
