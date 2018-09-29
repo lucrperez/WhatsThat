@@ -253,6 +253,7 @@ public class ShowImage extends AppCompatActivity {
                     try {
                         bitmap = android.provider.MediaStore.Images.Media
                                 .getBitmap(cr, selectedImage);
+                        bitmap = scaleBitmap(bitmap);
 
                         ByteArrayOutputStream baos = new ByteArrayOutputStream();
                         bitmap.compress(Bitmap.CompressFormat.JPEG, 75, baos); //bm is the bitmap object
@@ -275,6 +276,36 @@ public class ShowImage extends AppCompatActivity {
                     }
                 }
         }
+    }
+
+    private Bitmap scaleBitmap(Bitmap bm) {
+        final int maxWidth = 512;
+        final int maxHeight = 512;
+        int width = bm.getWidth();
+        int height = bm.getHeight();
+
+        Log.v("Pictures", "Width and height are " + width + "--" + height);
+
+        if (width > height) {
+            // landscape
+            float ratio = (float) width / maxWidth;
+            width = maxWidth;
+            height = (int)(height / ratio);
+        } else if (height > width) {
+            // portrait
+            float ratio = (float) height / maxHeight;
+            height = maxHeight;
+            width = (int)(width / ratio);
+        } else {
+            // square
+            height = maxHeight;
+            width = maxWidth;
+        }
+
+        Log.v("Pictures", "after scaling Width and height are " + width + "--" + height);
+
+        bm = Bitmap.createScaledBitmap(bm, width, height, true);
+        return bm;
     }
 
     @Override
