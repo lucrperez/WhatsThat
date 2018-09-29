@@ -250,11 +250,14 @@ public class LoginActivity extends AppCompatActivity {
                 Intent intent = new Intent();
                 intent.setClass(getApplicationContext(), ShowImage.class);
                 intent.putExtra(Constants.USER_ID, user.getId());
+                intent.putExtra(Constants.USER_USERNAME, user.getUsername());
+                startActivity(intent);
                 finish();
             } else {
                 spEditor.remove(Constants.USER_USERNAME);
                 spEditor.remove(Constants.USER_PASSWORD);
                 spEditor.remove(Constants.USER_ID);
+                spEditor.apply();
 
                 mPasswordView.setError(getString(R.string.error_incorrect_password));
                 mPasswordView.requestFocus();
